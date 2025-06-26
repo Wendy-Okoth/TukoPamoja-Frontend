@@ -1,38 +1,250 @@
+/* src/App.css */
+
+/* Global styles - affect the entire page */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: white; /* Main page background */
+  color: #333; /* Default text color for general content */
+}
+
+/* Main App container */
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  background-color: white; /* Ensure the app container is also white */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center; /* Center content horizontally */
+  padding: 20px;
+  box-sizing: border-box;
+  width: 100%; /* Ensure it spans full width */
+  max-width: 800px; /* Limit overall width for better readability on large screens */
+  margin: 20px auto; /* Center the App container itself */
+}
+
+/* Header content container */
+.app-header-content {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Main DApp title */
+.app-title {
+  color: #007bff; /* Blue for the main title */
+  margin-bottom: 20px;
+  font-size: 2.5em; /* Larger font size */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
+}
+
+/* Base button styles - ALL buttons will inherit these unless overridden */
+button {
+  background-color: #8A2BE2; /* Unified Purple for all buttons */
   color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px; /* More rounded */
+  cursor: pointer;
+  font-size: 1.1em;
+  margin-top: 20px; /* Adjust spacing above buttons */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background-color: #6A1FB8; /* Darker purple on hover for all buttons */
+  transform: translateY(-2px); /* Slight lift effect */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Specific button classes (now just align with base button) */
+/* .connect-wallet-button { } */
+/* .submit-button { } */
+/* .refresh-button { } */
+
+
+/* Container for DApp features when connected */
+.dapp-content-container {
+  width: 100%;
+  max-width: 700px; /* Limit width of internal content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Standard text for connected info */
+.info-text {
+  color: #007bff; /* Blue for info text */
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+/* Network status specifically */
+.network-status {
+  color: #8A2BE2; /* Purple for network name itself */
+}
+
+/* Loading and error messages */
+.loading-message {
+  color: #007bff; /* Blue for loading */
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+/* General section titles (e.g., "DApp Features", "Submit New Project", "All Active Projects") */
+.section-title {
+  color: #007bff; /* Blue for section titles */
+  border-bottom: 2px solid #eee; /* Light separator */
+  padding-bottom: 10px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  text-align: center;
+  width: 100%;
+}
+
+/* General DApp sections (forms, lists) */
+.dapp-section {
+  background-color: #E0CCFF; /* More distinct light purple for section background */
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+/* Separator line */
+.section-separator {
+  width: 80%;
+  border: none;
+  border-top: 1px dashed #ccc;
+  margin: 40px auto;
+}
+
+/* --- Project Submission Form Specific Styles --- */
+.project-submission-form-section {
+  /* Inherits from .dapp-section */
+}
+
+.form-group {
+  margin-bottom: 15px; /* Spacing between form fields */
+}
+
+.label-text {
+  display: block; /* Make labels appear on their own line */
+  margin-bottom: 8px;
+  color: #007bff; /* Blue for form labels like "Project Name:" */
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.form-input {
+  width: calc(100% - 24px); /* Full width minus padding/border */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 1em;
+  color: #8A2BE2; /* Purple for input text */
+  background-color: #fcfcfc; /* Very light background for inputs */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Blue glow on focus */
+}
+
+.form-input::placeholder {
+  color: #A06AD9; /* Lighter purple for placeholders */
+}
+
+
+/* --- Project List Specific Styles --- */
+.project-list-section {
+  /* Inherits from .dapp-section */
+}
+
+/* Search input specific styles */
+.search-group {
+  margin-bottom: 15px; /* Spacing between search and button */
+}
+
+.search-input {
+  width: calc(100% - 24px); /* Full width minus padding/border */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 1em;
+  color: #8A2BE2; /* Purple for search input text */
+  background-color: #fcfcfc; /* Very light background for search input */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Blue glow on focus */
+}
+
+.search-input::placeholder {
+  color: #A06AD9; /* Lighter purple for placeholders */
+}
+
+.project-list-ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.project-item {
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background-color: #ffffff; /* Explicitly white background for individual project items */
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.project-item-title {
+  color: #007bff; /* Blue for project name (e.g., "Community Gardening Project") */
+  font-size: 1.4em;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.project-item p {
+  margin: 5px 0;
+  color: #8A2BE2; /* Purple for the actual values (e.g., "0xD0...", "Qtesting123", "Yes") */
+  font-size: 0.95em;
+}
+
+/* This targets the 'strong' tags within '.project-item p' and makes them blue (labels) */
+.project-item p strong.project-item-strong-label { /* Specific class for strong labels in project items */
+  color: #007bff; /* Blue for labels like "Owner:", "Description CID:" */
+  font-weight: bold;
+}
+
+
+/* Remove default CRA styles if they exist and are not explicitly overwritten */
+.App-logo, .App-link {
+  display: none;
 }
