@@ -28,6 +28,7 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
             // 2. Loop through each project to fetch its contribution stats from QuadraticFunding
             for (const project of rawProjects) {
                 // IMPORTANT: Add a check for malformed project objects or missing IDs
+                // This prevents "Cannot read properties of undefined (reading 'toString')" if project.id is missing
                 if (!project || project.id === undefined || project.id === null) {
                     console.warn("Skipping malformed project object due to missing or invalid 'id':", project);
                     continue; // Skip this iteration if the project object is invalid
@@ -233,7 +234,7 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
                             <p><strong className="project-item-strong-label">Category:</strong> {project.category}</p>
                             <p><strong className="project-item-strong-label">Active:</strong> {project.isActive ? 'Yes' : 'No'}</p>
 
-                            {/* --- New: Display Contribution Stats --- */}
+                            {/* --- Display Contribution Stats --- */}
                             {project.stats && (
                                 <div className="project-stats-section">
                                     <h5 className="stats-section-title">Funding Progress:</h5>

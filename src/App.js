@@ -1,18 +1,20 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers'; // Import ethers
-import './App.css'; // Assuming you have an App.css
+import { ethers } from 'ethers';
+import './App.css';
 
 // Import contract addresses and ABIs
 import { CONTRACT_ADDRESSES } from './config/contractAddresses';
 import ProjectRegistryABI from './abi/ProjectRegistry.json';
 import AttestationServiceABI from './abi/AttestationService.json';
-import MockERC20ABI from './abi/MockERC20.json'; // ABI for Mock cUSD
+import MockERC20ABI from './abi/MockERC20.json';
 import QuadraticFundingABI from './abi/QuadraticFunding.json';
 
 // Import components
 import ProjectSubmissionForm from './components/ProjectSubmissionForm';
 import ProjectList from './components/ProjectList';
+import UserProfile from './components/UserProfile';
+import AttestationManagement from './components/AttestationManagement'; // NEW: Import AttestationManagement component
 
 function App() {
   // --- Wallet and Network State ---
@@ -25,13 +27,16 @@ function App() {
   // --- Contract Instances State ---
   const [projectRegistryContract, setProjectRegistryContract] = useState(null);
   const [attestationServiceContract, setAttestationServiceContract] = useState(null);
-  const [mockCUSDContract, setMockCUSDContract] = useState(null); // State for Mock cUSD contract
-  const [quadraticFundingContract, setQuadraticFundingContract] = useState(null); // State for Quadratic Funding contract
+  const [mockCUSDContract, setMockCUSDContract] = useState(null);
+  const [quadraticFundingContract, setQuadraticFundingContract] = useState(null);
 
   // --- UI/Loading/Error State ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [refreshProjects, setRefreshProjects] = useState(0); // Trigger for ProjectList refresh
+
+  // --- NEW: Page Navigation State ---
+  const [currentPage, setCurrentPage] = useState('projects'); // 'projects', 'submit', 'profile', or 'attest'
 
 
   // --- Function to Connect Wallet ---
@@ -39,15 +44,10 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      if (window.ethereum) { // Check if MetaMask or similar provider is available
-        // Request account access
+      if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        // Create a Web3Provider from Metamask's provider
         const newProvider = new ethers.BrowserProvider(window.ethereum);
         setProvider(newProvider);
-
-        // Get the signer (connected account)
         const newSigner = await newProvider.getSigner();
         setSigner(newSigner);
 
@@ -56,7 +56,7 @@ function App() {
         setIsConnected(true);
 
         const networkDetails = await newProvider.getNetwork();
-        setNetwork(networkDetails.name); // e.g., 'goerli', 'mainnet', or 'unknown' for local
+        setNetwork(networkDetails.name);
 
         console.log("Wallet connected:", address);
         console.log("Network:", networkDetails.name);
@@ -78,15 +78,13 @@ function App() {
     const initContracts = async () => {
       if (provider && signer) {
         try {
-          // Initialize ProjectRegistry Contract
           const projectRegistry = new ethers.Contract(
             CONTRACT_ADDRESSES.projectRegistry,
-            ProjectRegistryABI.abi, // .abi because it's in the artifact format
-            signer // Use the signer for write operations
+            ProjectRegistryABI.abi,
+            signer
           );
           setProjectRegistryContract(projectRegistry);
 
-          // Initialize AttestationService Contract
           const attestationService = new ethers.Contract(
             CONTRACT_ADDRESSES.attestationService,
             AttestationServiceABI.abi,
@@ -94,15 +92,13 @@ function App() {
           );
           setAttestationServiceContract(attestationService);
 
-          // Initialize Mock cUSD Contract (for approve function)
           const mockCUSD = new ethers.Contract(
             CONTRACT_ADDRESSES.mockCUSD,
-            MockERC20ABI.abi, // Assuming MockERC20ABI is your cUSD token's ABI
+            MockERC20ABI.abi,
             signer
           );
           setMockCUSDContract(mockCUSD);
 
-          // Initialize Quadratic Funding Contract
           const quadraticFunding = new ethers.Contract(
             CONTRACT_ADDRESSES.quadraticFunding,
             QuadraticFundingABI.abi,
@@ -115,7 +111,6 @@ function App() {
         } catch (error) {
           console.error("Error initializing contracts:", error);
           setError("Failed to initialize contracts. Please check network and addresses.");
-          // Clear contract instances if initialization fails
           setProjectRegistryContract(null);
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
@@ -125,29 +120,26 @@ function App() {
     };
 
     initContracts();
-  }, [provider, signer]); // Re-run when provider or signer changes
+  }, [provider, signer]);
 
 
   // --- Effect Hook: Check for existing connection on load and listen for changes ---
   useEffect(() => {
     const checkConnectionOnLoad = async () => {
       if (window.ethereum) {
-        // Attempt to connect if accounts are already present (e.g., user already connected MetaMask)
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
-          connectWallet(); // If accounts exist, try to connect
+          connectWallet();
         }
       }
     };
     checkConnectionOnLoad();
 
-    // Set up event listeners for MetaMask changes
     if (window.ethereum) {
       const handleAccountsChanged = (newAccounts) => {
         if (newAccounts.length > 0) {
-          connectWallet(); // Reconnect if accounts change
+          connectWallet();
         } else {
-          // Wallet disconnected
           setIsConnected(false);
           setAccount(null);
           setSigner(null);
@@ -161,13 +153,12 @@ function App() {
       };
 
       const handleChainChanged = () => {
-        window.location.reload(); // Reload page on network change
+        window.location.reload();
       };
 
       window.ethereum.on('accountsChanged', handleAccountsChanged);
       window.ethereum.on('chainChanged', handleChainChanged);
 
-      // Cleanup function for event listeners
       return () => {
         if (window.ethereum) {
           window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
@@ -175,13 +166,12 @@ function App() {
         }
       };
     }
-  }, []); // Run once on component mount
-
+  }, []);
 
   // --- Callback for when a project is successfully submitted ---
   const handleProjectSubmitted = () => {
-    setRefreshProjects(prev => prev + 1); // Increment to trigger re-fetch in ProjectList
-    // You could also add a success message display here
+    setRefreshProjects(prev => prev + 1);
+    setCurrentPage('projects'); // Navigate to projects page after submission
   };
 
   return (
@@ -212,29 +202,80 @@ function App() {
           <div className="dapp-features">
             <hr className="section-divider" />
 
-            {/* Project Submission Form */}
-            <ProjectSubmissionForm
-              projectRegistryContract={projectRegistryContract}
-              // attestationServiceContract is not directly used by submitProject in the contract
-              // so it's not needed as a prop for ProjectSubmissionForm
-              onProjectSubmitted={handleProjectSubmitted}
-              setLoading={setLoading}
-              setError={setError}
-              loading={loading}
-            />
+            {/* Navigation Buttons */}
+            <nav className="dapp-navigation">
+              <button
+                onClick={() => setCurrentPage('projects')}
+                className={`nav-button ${currentPage === 'projects' ? 'active' : ''}`}
+              >
+                All Projects
+              </button>
+              <button
+                onClick={() => setCurrentPage('submit')}
+                className={`nav-button ${currentPage === 'submit' ? 'active' : ''}`}
+              >
+                Submit Project
+              </button>
+              <button
+                onClick={() => setCurrentPage('profile')}
+                className={`nav-button ${currentPage === 'profile' ? 'active' : ''}`}
+              >
+                My Profile
+              </button>
+              <button
+                onClick={() => setCurrentPage('attest')} // NEW Navigation Button
+                className={`nav-button ${currentPage === 'attest' ? 'active' : ''}`}
+              >
+                Attestation Admin
+              </button>
+            </nav>
 
             <hr className="section-divider" />
 
-            {/* Project List */}
-            <ProjectList
-              projectRegistryContract={projectRegistryContract}
-              mockCUSDContract={mockCUSDContract}
-              quadraticFundingContract={quadraticFundingContract}
-              refreshTrigger={refreshProjects}
-              setLoading={setLoading}
-              setError={setError}
-              loading={loading}
-            />
+            {/* Conditional Rendering based on currentPage state */}
+            {currentPage === 'projects' && (
+              <ProjectList
+                projectRegistryContract={projectRegistryContract}
+                mockCUSDContract={mockCUSDContract}
+                quadraticFundingContract={quadraticFundingContract}
+                refreshTrigger={refreshProjects}
+                setLoading={setLoading}
+                setError={setError}
+                loading={loading}
+              />
+            )}
+
+            {currentPage === 'submit' && (
+              <ProjectSubmissionForm
+                projectRegistryContract={projectRegistryContract}
+                onProjectSubmitted={handleProjectSubmitted}
+                setLoading={setLoading}
+                setError={setError}
+                loading={loading}
+              />
+            )}
+
+            {currentPage === 'profile' && (
+              <UserProfile
+                account={account}
+                projectRegistryContract={projectRegistryContract}
+                quadraticFundingContract={quadraticFundingContract}
+                attestationServiceContract={attestationServiceContract}
+                setLoading={setLoading}
+                setError={setError}
+                loading={loading}
+              />
+            )}
+
+            {currentPage === 'attest' && ( // NEW Conditional Render for AttestationManagement
+              <AttestationManagement
+                account={account}
+                attestationServiceContract={attestationServiceContract}
+                setLoading={setLoading}
+                setError={setError}
+                loading={loading}
+              />
+            )}
           </div>
         )}
 

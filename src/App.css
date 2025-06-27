@@ -1,250 +1,475 @@
 /* src/App.css */
 
-/* Global styles - affect the entire page */
-body, html {
+/* General Body and App Layout */
+body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+  font-family: 'Inter', sans-serif; /* Using Inter font, or fallback to generic sans-serif */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: white; /* Main page background */
-  color: #333; /* Default text color for general content */
+  background-color: #e0f2f7; /* Light blue background for the entire page */
+  color: #333; /* Default text color */
+  line-height: 1.6;
 }
 
-/* Main App container */
 .App {
   text-align: center;
-  background-color: white; /* Ensure the app container is also white */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content horizontally */
+  align-items: center;
+  justify-content: flex-start; /* Align content to the top */
   padding: 20px;
-  box-sizing: border-box;
-  width: 100%; /* Ensure it spans full width */
-  max-width: 800px; /* Limit overall width for better readability on large screens */
-  margin: 20px auto; /* Center the App container itself */
+  box-sizing: border-box; /* Include padding in element's total width */
 }
 
-/* Header content container */
-.app-header-content {
-  width: 100%;
-  text-align: center;
+.App-header {
+  background-color: #ffffff; /* White background for the header area */
+  border-radius: 15px;
+  padding: 30px 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 30px;
-}
-
-/* Main DApp title */
-.app-title {
-  color: #007bff; /* Blue for the main title */
-  margin-bottom: 20px;
-  font-size: 2.5em; /* Larger font size */
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
-}
-
-/* Base button styles - ALL buttons will inherit these unless overridden */
-button {
-  background-color: #8A2BE2; /* Unified Purple for all buttons */
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 25px; /* More rounded */
-  cursor: pointer;
-  font-size: 1.1em;
-  margin-top: 20px; /* Adjust spacing above buttons */
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-button:hover {
-  background-color: #6A1FB8; /* Darker purple on hover for all buttons */
-  transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* Specific button classes (now just align with base button) */
-/* .connect-wallet-button { } */
-/* .submit-button { } */
-/* .refresh-button { } */
-
-
-/* Container for DApp features when connected */
-.dapp-content-container {
   width: 100%;
-  max-width: 700px; /* Limit width of internal content */
+  max-width: 1000px; /* Max width for the main content area */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Standard text for connected info */
-.info-text {
-  color: #007bff; /* Blue for info text */
-  font-weight: bold;
-  margin: 5px 0;
+h1 {
+  color: #4b0082; /* Darker purple for main title */
+  margin-bottom: 20px;
+  font-size: 2.8rem;
+  letter-spacing: -0.5px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Network status specifically */
-.network-status {
-  color: #8A2BE2; /* Purple for network name itself */
+/* Wallet Connection Section */
+.wallet-connect-section {
+  background-color: #f7f9fc; /* Very light blue/gray */
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Loading and error messages */
-.loading-message {
-  color: #007bff; /* Blue for loading */
+.connect-button {
+  padding: 12px 25px;
+  background-color: #6a5acd; /* Primary purple */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
   font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.connect-button:hover {
+  background-color: #8a7acd; /* Lighter purple on hover */
+  transform: translateY(-2px);
+}
+
+.connect-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.connected-account-address,
+.connected-network-name {
+  font-weight: bold;
+  color: #4b0082; /* Darker purple */
+}
+
+/* Global Messages */
+.status-message {
+  padding: 10px 15px;
+  border-radius: 8px;
   margin: 15px 0;
+  font-weight: 500;
+  text-align: center;
+}
+
+.loading-message {
+  background-color: #e0f7fa; /* Light cyan */
+  color: #00796b; /* Dark cyan text */
+  border: 1px solid #b2ebf2;
 }
 
 .error-message {
-  color: red;
-  font-weight: bold;
-  margin: 15px 0;
+  background-color: #ffebee; /* Light red */
+  color: #c62828; /* Dark red text */
+  border: 1px solid #ef9a9a;
 }
 
-/* General section titles (e.g., "DApp Features", "Submit New Project", "All Active Projects") */
-.section-title {
-  color: #007bff; /* Blue for section titles */
-  border-bottom: 2px solid #eee; /* Light separator */
-  padding-bottom: 10px;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  font-size: 1.8em;
-  text-align: center;
+/* DApp Features Section */
+.dapp-features {
   width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* General DApp sections (forms, lists) */
-.dapp-section {
-  background-color: #E0CCFF; /* More distinct light purple for section background */
-  padding: 25px;
-  margin-bottom: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 600px;
-  box-sizing: border-box;
-  text-align: left;
-}
-
-/* Separator line */
-.section-separator {
+.section-divider {
   width: 80%;
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(106, 90, 205, 0.75), rgba(0, 0, 0, 0));
+  margin: 30px 0;
+}
+
+
+/* Navigation Buttons */
+.dapp-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 15px; /* Space between buttons */
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background-color: #6a5acd; /* Primary purple */
+  color: white;
   border: none;
-  border-top: 1px dashed #ccc;
-  margin: 40px auto;
-}
-
-/* --- Project Submission Form Specific Styles --- */
-.project-submission-form-section {
-  /* Inherits from .dapp-section */
-}
-
-.form-group {
-  margin-bottom: 15px; /* Spacing between form fields */
-}
-
-.label-text {
-  display: block; /* Make labels appear on their own line */
-  margin-bottom: 8px;
-  color: #007bff; /* Blue for form labels like "Project Name:" */
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
   font-weight: bold;
-  font-size: 1.1em;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 120px; /* Ensure consistent button size */
+  text-align: center;
 }
 
-.form-input {
-  width: calc(100% - 24px); /* Full width minus padding/border */
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 1em;
-  color: #8A2BE2; /* Purple for input text */
-  background-color: #fcfcfc; /* Very light background for inputs */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.nav-button:hover {
+  background-color: #8a7acd; /* Lighter purple on hover */
+  transform: translateY(-2px);
 }
 
-.form-input:focus {
-  border-color: #007bff; /* Blue border on focus */
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Blue glow on focus */
+.nav-button.active {
+  background-color: #4b0082; /* Darker purple for active state */
+  border: 2px solid #a05acd;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.form-input::placeholder {
-  color: #A06AD9; /* Lighter purple for placeholders */
-}
-
-
-/* --- Project List Specific Styles --- */
-.project-list-section {
-  /* Inherits from .dapp-section */
-}
-
-/* Search input specific styles */
-.search-group {
-  margin-bottom: 15px; /* Spacing between search and button */
-}
-
-.search-input {
-  width: calc(100% - 24px); /* Full width minus padding/border */
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 1em;
-  color: #8A2BE2; /* Purple for search input text */
-  background-color: #fcfcfc; /* Very light background for search input */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.search-input:focus {
-  border-color: #007bff; /* Blue border on focus */
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Blue glow on focus */
-}
-
-.search-input::placeholder {
-  color: #A06AD9; /* Lighter purple for placeholders */
-}
-
-.project-list-ul {
-  list-style-type: none;
-  padding: 0;
+/* Common Section Styling (Project Submission, Project List, User Profile, Attestation Management) */
+.dapp-section {
+  background-color: #f0f0f0; /* Light background for the section */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 20px;
   width: 100%;
+  max-width: 900px; /* Max width for readability */
+  box-sizing: border-box; /* Include padding in width */
+}
+
+/* Profile and Attestation Management Subsections */
+.profile-subsection,
+.owner-controls,
+.attestor-controls {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.subsection-title {
+  color: #6a5acd;
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* Attestation-specific styles */
+.attestation-type-label {
+  color: #333;
+  font-weight: 600;
+}
+
+.attestation-type-label + span {
+  margin-left: 5px;
+}
+
+/* Project Item Styling (in ProjectList and UserProfile) */
+.project-list-ul {
+  list-style: none; /* Remove default list bullets */
+  padding: 0;
+  margin: 20px 0;
+  width: 100%; /* Ensure list takes full width of its container */
 }
 
 .project-item {
-  border: 1px solid #e0e0e0;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  background-color: #ffffff; /* Explicitly white background for individual project items */
-  text-align: left;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  text-align: left; /* Align text within project item */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .project-item-title {
-  color: #007bff; /* Blue for project name (e.g., "Community Gardening Project") */
-  font-size: 1.4em;
+  color: #4b0082;
+  font-size: 1.1rem;
   margin-top: 0;
   margin-bottom: 10px;
 }
 
-.project-item p {
-  margin: 5px 0;
-  color: #8A2BE2; /* Purple for the actual values (e.g., "0xD0...", "Qtesting123", "Yes") */
-  font-size: 0.95em;
+.project-item-strong-label {
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
 }
 
-/* This targets the 'strong' tags within '.project-item p' and makes them blue (labels) */
-.project-item p strong.project-item-strong-label { /* Specific class for strong labels in project items */
-  color: #007bff; /* Blue for labels like "Owner:", "Description CID:" */
+.info-text {
+  font-style: italic;
+  color: #555;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* Form Group Styles (common to all forms) */
+.form-group {
+  margin-bottom: 15px;
+  text-align: left; /* Align labels and inputs to the left */
+  width: 100%;
+}
+
+.label-text {
+  display: block;
+  margin-bottom: 8px;
   font-weight: bold;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  font-size: 1rem;
+  color: #333;
+}
+
+.form-input:focus {
+  border-color: #6a5acd;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.25);
+}
+
+/* Specific styling for file inputs */
+.file-input {
+  padding: 8px 5px; /* Adjust padding for file input */
+  border: 1px dashed #a0a0a0; /* Dotted border for file input */
+  background-color: #fcfcfc;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.file-input:hover {
+  border-color: #6a5acd;
+}
+
+.selected-files-info {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Button Styling (common for submit, add, approve, contribute) */
+.submit-button,
+.add-button,
+.approve-button,
+.contribute-button {
+  padding: 10px 20px;
+  background-color: #6a5acd; /* Primary purple */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 10px; /* Space from inputs/other buttons */
+}
+
+.submit-button:hover,
+.add-button:hover,
+.approve-button:hover,
+.contribute-button:hover {
+  background-color: #8a7acd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.submit-button:disabled,
+.add-button:disabled,
+.approve-button:disabled,
+.contribute-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Specific style for remove buttons */
+.remove-button {
+  background-color: #dc3545; /* Red for destructive action */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+  background-color: #c82333;
+}
+
+.remove-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Layout for button groups */
+.button-group {
+  display: flex;
+  gap: 15px; /* Space between buttons in a group */
+  margin-top: 20px;
+  justify-content: center; /* Center buttons */
+  flex-wrap: wrap; /* Allow buttons to wrap */
+}
+
+/* Project Media (Images and Audio) */
+.project-media-section {
+  margin-top: 20px;
+  border-top: 1px dashed #e0e0e0;
+  padding-top: 15px;
+}
+
+.media-section-title {
+  color: #6a5acd;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.media-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Space between media items */
+  justify-content: center; /* Center media items */
+}
+
+.project-image {
+  max-width: 150px; /* Max size for images */
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.project-audio {
+  width: 100%; /* Take full width within its container */
+  max-width: 300px; /* Max width for audio player */
+  margin: 5px 0;
+}
+
+/* Upload Status / CID Preview */
+.upload-status-info, .uploaded-cids-preview {
+  background-color: #e6f7ff; /* Light blue background */
+  border: 1px solid #91d5ff;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: #1890ff; /* Blue text */
+  text-align: left;
+}
+
+.uploaded-cids-preview h4, .uploaded-cids-preview h5 {
+  color: #1890ff;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.uploaded-cids-preview ul {
+  list-style: disc inside;
+  padding-left: 15px;
+}
+.uploaded-cids-preview li {
+  word-break: break-all; /* Break long CIDs */
+  margin-bottom: 5px;
+}
+.uploaded-cids-preview a {
+  color: #096dd9; /* Darker blue for links */
+  text-decoration: underline;
 }
 
 
-/* Remove default CRA styles if they exist and are not explicitly overwritten */
-.App-logo, .App-link {
-  display: none;
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  h1 {
+      font-size: 2rem;
+  }
+
+  .App-header {
+      padding: 20px 15px;
+  }
+
+  .dapp-navigation {
+      flex-direction: column; /* Stack buttons vertically on small screens */
+      align-items: stretch; /* Stretch buttons to full width */
+      gap: 10px; /* Reduce gap */
+  }
+
+  .nav-button {
+      min-width: unset; /* Remove min-width */
+      width: 100%; /* Take full width */
+  }
+
+  .dapp-section {
+      padding: 15px;
+  }
+
+  .profile-subsection,
+  .owner-controls,
+  .attestor-controls {
+      padding: 15px;
+  }
+
+  .button-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .submit-button, .approve-button, .contribute-button, .add-button, .remove-button {
+      width: 100%; /* Full width for buttons in groups */
+      margin-left: 0; /* Reset margin */
+      margin-right: 0; /* Reset margin */
+  }
+
+  .project-image {
+      max-width: 100px; /* Smaller images on mobile */
+  }
 }
