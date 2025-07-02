@@ -1,475 +1,410 @@
 /* src/App.css */
 
-/* General Body and App Layout */
+/* General Body and App Container Styles */
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif; /* Using Inter font, or fallback to generic sans-serif */
+  font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #e0f2f7; /* Light blue background for the entire page */
+  background-color: #f0f2f5; /* Light grey background */
   color: #333; /* Default text color */
   line-height: 1.6;
 }
 
 .App {
   text-align: center;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Align content to the top */
   padding: 20px;
-  box-sizing: border-box; /* Include padding in element's total width */
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* Header Styles */
 .App-header {
-  background-color: #ffffff; /* White background for the header area */
-  border-radius: 15px;
-  padding: 30px 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  background-color: #ffffff; /* White background for header */
+  padding: 20px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-bottom: 30px;
-  width: 100%;
-  max-width: 1000px; /* Max width for the main content area */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-h1 {
-  color: #4b0082; /* Darker purple for main title */
+.App-header h1 {
+  /* Major Title: Dark Blue */
+  color: #1A2B5B; /* Dark Blue */
+  font-size: 2.8em;
   margin-bottom: 20px;
-  font-size: 2.8rem;
-  letter-spacing: -0.5px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  font-weight: 700;
 }
 
 /* Wallet Connection Section */
 .wallet-connect-section {
-  background-color: #f7f9fc; /* Very light blue/gray */
   padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.connect-button {
-  padding: 12px 25px;
-  background-color: #6a5acd; /* Primary purple */
-  color: white;
-  border: none;
+  background-color: #e9ecef; /* Slightly darker grey for this section */
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.connect-button:hover {
-  background-color: #8a7acd; /* Lighter purple on hover */
-  transform: translateY(-2px);
-}
-
-.connect-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+  margin-bottom: 20px;
+  border: 1px solid #dee2e6;
 }
 
 .connected-account-address,
 .connected-network-name {
   font-weight: bold;
-  color: #4b0082; /* Darker purple */
+  color: #007bff; /* A standard blue for emphasis */
 }
 
-/* Global Messages */
-.status-message {
-  padding: 10px 15px;
+/* General Button Styles (Dark Purple) */
+.connect-button,
+.nav-button,
+.submit-button,
+.refresh-button,
+.attest-button { /* Added attest-button for AttestationManagement */
+  background-color: #5A2D82; /* Dark Purple */
+  color: white;
+  border: none;
+  padding: 12px 25px;
   border-radius: 8px;
-  margin: 15px 0;
-  font-weight: 500;
-  text-align: center;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 5px; /* Add some margin for spacing */
 }
 
-.loading-message {
-  background-color: #e0f7fa; /* Light cyan */
-  color: #00796b; /* Dark cyan text */
-  border: 1px solid #b2ebf2;
+.connect-button:hover,
+.nav-button:hover,
+.submit-button:hover,
+.refresh-button:hover,
+.attest-button:hover {
+  background-color: #6C3DA2; /* Slightly lighter purple on hover */
+  transform: translateY(-2px);
 }
 
-.error-message {
-  background-color: #ffebee; /* Light red */
-  color: #c62828; /* Dark red text */
-  border: 1px solid #ef9a9a;
+.connect-button:disabled,
+.nav-button:disabled,
+.submit-button:disabled,
+.refresh-button:disabled,
+.attest-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
-/* DApp Features Section */
-.dapp-features {
-  width: 100%;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.section-divider {
-  width: 80%;
-  border: 0;
-  height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(106, 90, 205, 0.75), rgba(0, 0, 0, 0));
-  margin: 30px 0;
-}
-
-
-/* Navigation Buttons */
+/* Navigation Specific Styles */
 .dapp-navigation {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
   gap: 15px; /* Space between buttons */
-  margin-bottom: 20px;
-  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-}
-
-.nav-button {
-  padding: 10px 20px;
-  background-color: #6a5acd; /* Primary purple */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  min-width: 120px; /* Ensure consistent button size */
-  text-align: center;
-}
-
-.nav-button:hover {
-  background-color: #8a7acd; /* Lighter purple on hover */
-  transform: translateY(-2px);
+  margin-bottom: 25px;
 }
 
 .nav-button.active {
-  background-color: #4b0082; /* Darker purple for active state */
-  border: 2px solid #a05acd;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background-color: #4B0082; /* A slightly darker shade of purple for active state */
+  border: 2px solid #6C3DA2;
 }
 
-/* Common Section Styling (Project Submission, Project List, User Profile, Attestation Management) */
-.dapp-section {
-  background-color: #f0f0f0; /* Light background for the section */
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  margin-top: 20px;
-  width: 100%;
-  max-width: 900px; /* Max width for readability */
-  box-sizing: border-box; /* Include padding in width */
-}
-
-/* Profile and Attestation Management Subsections */
-.profile-subsection,
-.owner-controls,
-.attestor-controls {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  margin-top: 20px;
-  border: 1px solid #e0e0e0;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.subsection-title {
-  color: #6a5acd;
-  font-size: 1.4rem;
-  margin-top: 0;
+/* Section Titles (Dark Blue) */
+.section-title,
+.project-item-title { /* project-item-title is your h4 for project names */
+  color: #1A2B5B; /* Dark Blue */
+  font-size: 1.8em;
+  margin-top: 25px;
   margin-bottom: 15px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 5px;
-}
-
-/* Attestation-specific styles */
-.attestation-type-label {
-  color: #333;
   font-weight: 600;
 }
 
-.attestation-type-label + span {
-  margin-left: 5px;
+/* DApp Features Container */
+.dapp-features {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Project Item Styling (in ProjectList and UserProfile) */
-.project-list-ul {
-  list-style: none; /* Remove default list bullets */
-  padding: 0;
-  margin: 20px 0;
-  width: 100%; /* Ensure list takes full width of its container */
+/* Divider Line */
+.section-divider {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #ccc, rgba(0, 0, 0, 0));
+  margin: 30px 0;
 }
 
-.project-item {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
-  text-align: left; /* Align text within project item */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Status Messages */
+.status-message {
+  padding: 10px 20px;
+  margin: 15px auto;
+  border-radius: 5px;
+  font-weight: bold;
+  max-width: 600px;
 }
 
-.project-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+.loading-message {
+  background-color: #e0f7fa;
+  color: #007bff;
+  border: 1px solid #007bff;
 }
 
-.project-item-title {
-  color: #4b0082;
-  font-size: 1.1rem;
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-.project-item-strong-label {
-  font-weight: 600;
-  color: #555;
-  margin-right: 5px;
+.error-message {
+  background-color: #ffebee;
+  color: #dc3545;
+  border: 1px solid #dc3545;
 }
 
 .info-text {
-  font-style: italic;
-  color: #555;
-  text-align: center;
-  margin-top: 15px;
+    font-style: italic;
+    color: #666;
+    margin-top: 20px;
 }
 
-/* Form Group Styles (common to all forms) */
+/* Form Styles */
 .form-group {
-  margin-bottom: 15px;
-  text-align: left; /* Align labels and inputs to the left */
-  width: 100%;
-}
-
-.label-text {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
-}
-
-.form-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  font-size: 1rem;
-  color: #333;
-}
-
-.form-input:focus {
-  border-color: #6a5acd;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.25);
-}
-
-/* Specific styling for file inputs */
-.file-input {
-  padding: 8px 5px; /* Adjust padding for file input */
-  border: 1px dashed #a0a0a0; /* Dotted border for file input */
-  background-color: #fcfcfc;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.file-input:hover {
-  border-color: #6a5acd;
-}
-
-.selected-files-info {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
-}
-
-/* Button Styling (common for submit, add, approve, contribute) */
-.submit-button,
-.add-button,
-.approve-button,
-.contribute-button {
-  padding: 10px 20px;
-  background-color: #6a5acd; /* Primary purple */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-top: 10px; /* Space from inputs/other buttons */
-}
-
-.submit-button:hover,
-.add-button:hover,
-.approve-button:hover,
-.contribute-button:hover {
-  background-color: #8a7acd;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.submit-button:disabled,
-.add-button:disabled,
-.approve-button:disabled,
-.contribute-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Specific style for remove buttons */
-.remove-button {
-  background-color: #dc3545; /* Red for destructive action */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-left: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.remove-button:hover {
-  background-color: #c82333;
-}
-
-.remove-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-/* Layout for button groups */
-.button-group {
-  display: flex;
-  gap: 15px; /* Space between buttons in a group */
-  margin-top: 20px;
-  justify-content: center; /* Center buttons */
-  flex-wrap: wrap; /* Allow buttons to wrap */
-}
-
-/* Project Media (Images and Audio) */
-.project-media-section {
-  margin-top: 20px;
-  border-top: 1px dashed #e0e0e0;
-  padding-top: 15px;
-}
-
-.media-section-title {
-  color: #6a5acd;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-}
-
-.media-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px; /* Space between media items */
-  justify-content: center; /* Center media items */
-}
-
-.project-image {
-  max-width: 150px; /* Max size for images */
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.project-audio {
-  width: 100%; /* Take full width within its container */
-  max-width: 300px; /* Max width for audio player */
-  margin: 5px 0;
-}
-
-/* Upload Status / CID Preview */
-.upload-status-info, .uploaded-cids-preview {
-  background-color: #e6f7ff; /* Light blue background */
-  border: 1px solid #91d5ff;
-  border-radius: 8px;
-  padding: 10px 15px;
-  margin-top: 15px;
-  font-size: 0.95rem;
-  color: #1890ff; /* Blue text */
+  margin-bottom: 20px;
   text-align: left;
 }
 
-.uploaded-cids-preview h4, .uploaded-cids-preview h5 {
-  color: #1890ff;
-  margin-top: 0;
+.form-label {
+  display: block;
   margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
 }
-.uploaded-cids-preview ul {
-  list-style: disc inside;
-  padding-left: 15px;
+
+.form-input,
+.form-textarea {
+  width: calc(100% - 22px); /* Account for padding and border */
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1em;
+  box-sizing: border-box; /* Include padding in width */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.uploaded-cids-preview li {
-  word-break: break-all; /* Break long CIDs */
-  margin-bottom: 5px;
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #5A2D82; /* Dark Purple focus */
+  box-shadow: 0 0 0 0.2rem rgba(90, 45, 130, 0.25); /* Dark Purple shadow */
+  outline: none;
 }
-.uploaded-cids-preview a {
-  color: #096dd9; /* Darker blue for links */
+
+.form-textarea {
+  resize: vertical; /* Allow vertical resizing */
+  min-height: 80px;
+}
+
+.file-input-label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* Project List Specific Styles */
+.project-list-ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.project-item {
+  background-color: #f8f9fa; /* Lighter background for list items */
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+
+.project-item p {
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.project-item-strong-label {
+  color: #343a40;
+}
+
+.project-item a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.project-item a:hover {
   text-decoration: underline;
 }
 
+/* Media Section Styles */
+.project-media-section {
+    margin-top: 20px;
+    border-top: 1px dashed #ced4da;
+    padding-top: 15px;
+}
+
+.media-section-title {
+    font-size: 1.2em;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+.media-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.project-media-item {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.project-image {
+    max-width: 150px; /* Smaller size for images in list */
+    max-height: 150px;
+    object-fit: cover;
+}
+
+.project-audio {
+    width: 100%; /* Full width for audio player */
+    max-width: 400px;
+}
+
+/* Project Stats Section */
+.project-stats-section {
+    margin-top: 20px;
+    border-top: 1px dashed #ced4da;
+    padding-top: 15px;
+}
+
+.stats-section-title {
+    font-size: 1.2em;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+/* User Profile Specific Styles */
+.user-profile-section {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+.user-profile-section h3 {
+    text-align: center;
+}
+
+.profile-info p {
+    margin-bottom: 10px;
+}
+
+.profile-info strong {
+    color: #343a40;
+}
+
+.profile-attestations ul {
+    list-style: disc;
+    margin-left: 20px;
+}
+
+.profile-projects-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.profile-project-item {
+    background-color: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Attestation Management Styles */
+.attestation-management-section {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-align: left;
+}
+
+.attestation-management-section h3 {
+    text-align: center;
+}
+
+.attestation-form {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed #ced4da;
+}
+
+.attestation-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.attestation-item {
+    background-color: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.attestation-item span {
+    font-weight: 500;
+    color: #343a40;
+}
+
+/* Footer/Info */
+.app-info {
+  margin-top: 40px;
+  font-size: 0.9em;
+  color: #777;
+}
+
+.App-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.App-link:hover {
+  text-decoration: underline;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  h1 {
-      font-size: 2rem;
+  .App-header h1 {
+    font-size: 2em;
   }
 
-  .App-header {
-      padding: 20px 15px;
+  .section-title,
+  .project-item-title {
+    font-size: 1.5em;
   }
 
   .dapp-navigation {
-      flex-direction: column; /* Stack buttons vertically on small screens */
-      align-items: stretch; /* Stretch buttons to full width */
-      gap: 10px; /* Reduce gap */
+    flex-direction: column;
+    align-items: center;
   }
 
   .nav-button {
-      min-width: unset; /* Remove min-width */
-      width: 100%; /* Take full width */
+    width: 90%; /* Make buttons full width on small screens */
+    margin: 5px 0;
   }
 
-  .dapp-section {
-      padding: 15px;
-  }
-
-  .profile-subsection,
-  .owner-controls,
-  .attestor-controls {
-      padding: 15px;
-  }
-
-  .button-group {
-      flex-direction: column;
-      gap: 10px;
-  }
-
-  .submit-button, .approve-button, .contribute-button, .add-button, .remove-button {
-      width: 100%; /* Full width for buttons in groups */
-      margin-left: 0; /* Reset margin */
-      margin-right: 0; /* Reset margin */
-  }
-
-  .project-image {
-      max-width: 100px; /* Smaller images on mobile */
+  .form-input,
+  .form-textarea {
+    width: 100%;
   }
 }

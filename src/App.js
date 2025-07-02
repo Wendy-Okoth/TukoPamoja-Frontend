@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import './App.css';
+import { ToastContainer, toast } from 'react-toastify'; // NEW: Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css'; // NEW: Import toastify CSS
 
 // Import contract addresses and ABIs
 import { CONTRACT_ADDRESSES } from './config/contractAddresses';
@@ -14,7 +16,7 @@ import QuadraticFundingABI from './abi/QuadraticFunding.json';
 import ProjectSubmissionForm from './components/ProjectSubmissionForm';
 import ProjectList from './components/ProjectList';
 import UserProfile from './components/UserProfile';
-import AttestationManagement from './components/AttestationManagement'; // NEW: Import AttestationManagement component
+import AttestationManagement from './components/AttestationManagement';
 
 function App() {
   // --- Wallet and Network State ---
@@ -32,7 +34,17 @@ function App() {
 
   // --- UI/Loading/Error State ---
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // Removed: const [error, setError] = useState(null); // Error state will be handled by toasts
+
+  // NEW: Toast functions to replace setError
+  const showError = (message) => {
+    toast.error(message);
+  };
+
+  const showSuccess = (message) => {
+    toast.success(message);
+  };
+
   const [refreshProjects, setRefreshProjects] = useState(0); // Trigger for ProjectList refresh
 
   // --- NEW: Page Navigation State ---
@@ -42,7 +54,7 @@ function App() {
   // --- Function to Connect Wallet ---
   const connectWallet = async () => {
     setLoading(true);
-    setError(null);
+    // Removed: setError(null);
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -58,16 +70,17 @@ function App() {
         const networkDetails = await newProvider.getNetwork();
         setNetwork(networkDetails.name);
 
+        showSuccess("Wallet connected: " + address.substring(0, 6) + "..."); // Show success toast
         console.log("Wallet connected:", address);
         console.log("Network:", networkDetails.name);
 
       } else {
-        setError("MetaMask or a compatible wallet is not installed.");
+        showError("MetaMask or a compatible wallet is not installed."); // Show error toast
         console.log("MetaMask or a compatible wallet is not installed.");
       }
     } catch (err) {
       console.error("Error connecting wallet:", err);
-      setError(`Error connecting wallet: ${err.message || err.toString()}`);
+      showError(`Error connecting wallet: ${err.message || err.toString()}`); // Show error toast
     } finally {
       setLoading(false);
     }
@@ -110,7 +123,7 @@ function App() {
 
         } catch (error) {
           console.error("Error initializing contracts:", error);
-          setError("Failed to initialize contracts. Please check network and addresses.");
+          showError("Failed to initialize contracts. Please check network and addresses."); // Show error toast
           setProjectRegistryContract(null);
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
@@ -148,6 +161,7 @@ function App() {
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
           setQuadraticFundingContract(null);
+          showError("Wallet disconnected."); // Show toast on disconnect
           console.log("Wallet disconnected.");
         }
       };
@@ -172,10 +186,13 @@ function App() {
   const handleProjectSubmitted = () => {
     setRefreshProjects(prev => prev + 1);
     setCurrentPage('projects'); // Navigate to projects page after submission
+    showSuccess("Project submitted successfully!"); // Show success toast
   };
 
   return (
     <div className="App">
+      {/* NEW: ToastContainer component for displaying notifications */}
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       <header className="App-header">
         <h1>Tuko Pamoja DApp</h1>
 
@@ -193,9 +210,9 @@ function App() {
           )}
         </div>
 
-        {/* Global Loading and Error Messages */}
+        {/* Removed: Global Error Message display (now handled by toasts) */}
         {loading && <p className="status-message loading-message">Loading...</p>}
-        {error && <p className="status-message error-message">Error: {error}</p>}
+
 
         {/* DApp Features Section (only show if wallet is connected) */}
         {isConnected && (
@@ -223,7 +240,7 @@ function App() {
                 My Profile
               </button>
               <button
-                onClick={() => setCurrentPage('attest')} // NEW Navigation Button
+                onClick={() => setCurrentPage('attest')}
                 className={`nav-button ${currentPage === 'attest' ? 'active' : ''}`}
               >
                 Attestation Admin
@@ -240,7 +257,7 @@ function App() {
                 quadraticFundingContract={quadraticFundingContract}
                 refreshTrigger={refreshProjects}
                 setLoading={setLoading}
-                setError={setError}
+                setError={showError} // Pass showError function
                 loading={loading}
               />
             )}
@@ -250,7 +267,8 @@ function App() {
                 projectRegistryContract={projectRegistryContract}
                 onProjectSubmitted={handleProjectSubmitted}
                 setLoading={setLoading}
-                setError={setError}
+                setError={showError} // Pass showError function
+                showSuccess={showSuccess} // Pass showSuccess function
                 loading={loading}
               />
             )}
@@ -262,17 +280,18 @@ function App() {
                 quadraticFundingContract={quadraticFundingContract}
                 attestationServiceContract={attestationServiceContract}
                 setLoading={setLoading}
-                setError={setError}
+                setError={showError} // Pass showError function
                 loading={loading}
               />
             )}
 
-            {currentPage === 'attest' && ( // NEW Conditional Render for AttestationManagement
+            {currentPage === 'attest' && (
               <AttestationManagement
                 account={account}
                 attestationServiceContract={attestationServiceContract}
                 setLoading={setLoading}
-                setError={setError}
+                setError={showError} // Pass showError function
+                showSuccess={showSuccess} // Pass showSuccess function
                 loading={loading}
               />
             )}

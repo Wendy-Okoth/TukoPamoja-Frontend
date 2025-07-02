@@ -3,91 +3,116 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 
 // Assume a list of attestation types your system might issue
-// You can expand this array as you add more attestation types
 const ATTESTATION_TYPES_TO_CHECK = ["Artist", "Verified Builder", "Community Member", "Contributor"];
 
-function UserProfile({ account, projectRegistryContract, quadraticFundingContract, attestationServiceContract, setLoading, setError, loading }) {
+function UserProfile({ account, projectRegistryContract, quadraticFundingContract, attestationServiceContract, setLoading, setError, loading, mockCUSDContract }) {
     const [ownedProjects, setOwnedProjects] = useState([]);
     const [contributedProjects, setContributedProjects] = useState([]);
-    const [userAttestations, setUserAttestations] = useState({}); // { "Artist": true, "Verified Builder": false }
+    const [userAttestations, setUserAttestations] = useState({});
     const [profileLoading, setProfileLoading] = useState(true); // Separate loading state for profile
+    const [mcUSDbalance, setMcusdBalance] = useState('0'); // State for mCUSD balance
 
     const fetchUserProfileData = async () => {
-        // Ensure all necessary contracts and account are available
-        if (!account || !projectRegistryContract || !quadraticFundingContract || !attestationServiceContract) {
+        if (!account || !projectRegistryContract || !quadraticFundingContract || !attestationServiceContract || !mockCUSDContract) {
             setOwnedProjects([]);
             setContributedProjects([]);
             setUserAttestations({});
+            setMcusdBalance('0');
             setProfileLoading(false);
             return;
         }
 
         setProfileLoading(true);
-        setError(null); // Clear errors specific to profile page
+        setError(null); // Clear errors specific to profile page via toast
 
         try {
-            // --- Fetch All Projects to Determine Owned and Contributed ---
+            // --- Fetch All Projects ---
             const allProjects = await projectRegistryContract.getAllActiveProjects();
-            const owned = [];
-            const contributed = [];
 
+            const ownedPromises = [];
+            const contributedPromises = [];
+            const attestationPromises = [];
+
+            // Prepare promises for owned and contributed projects
             for (const project of allProjects) {
-                // IMPORTANT: Add safety check for the project object and its ID
                 if (!project || project.id === undefined || project.id === null) {
                     console.warn("Skipping malformed project object in UserProfile due to missing or invalid 'id':", project);
-                    continue; // Skip this iteration if the project object is invalid
+                    continue;
                 }
 
                 // Check if user is the owner
-                // Ensure owner address exists and convert to lowercase for case-insensitive comparison
                 if (project.owner && project.owner.toLowerCase() === account.toLowerCase()) {
-                    owned.push(project);
+                    ownedPromises.push(Promise.resolve(project)); // Already have the project data
                 }
 
                 // Check for user's contribution to this project
-                try {
-                    const contributorAmount = await quadraticFundingContract.getContributorAmount(project.id, account);
-                    // Check if the contributor has sent any amount greater than zero
-                    if (contributorAmount > ethers.getBigInt(0)) {
-                        contributed.push({
-                            ...project,
-                            yourContribution: contributorAmount // Store the amount contributed by this user
-                        });
-                    }
-                } catch (contributionErr) {
-                    // Log but don't stop if fetching individual contribution fails
-                    console.warn(`Could not get contribution for project ID ${project.id.toString()} by ${account}:`, contributionErr.message);
-                }
+                contributedPromises.push(
+                    (async () => {
+                        try {
+                            const contributorAmount = await quadraticFundingContract.getContributorAmount(project.id, account);
+                            if (contributorAmount > ethers.getBigInt(0)) {
+                                return {
+                                    ...project,
+                                    yourContribution: contributorAmount
+                                };
+                            }
+                            return null; // No contribution
+                        } catch (contributionErr) {
+                            console.warn(`Could not get contribution for project ID ${project.id.toString()} by ${account}:`, contributionErr.message);
+                            return null; // On error, treat as no contribution
+                        }
+                    })()
+                );
             }
-            setOwnedProjects(owned);
-            setContributedProjects(contributed);
 
-            // --- Fetch User Attestations ---
-            const attestations = {};
+            // Execute all contribution checks in parallel
+            const allContributions = await Promise.all(contributedPromises);
+            setContributedProjects(allContributions.filter(p => p !== null)); // Filter out nulls
+
+            // Execute all owned projects (already resolved promises)
+            setOwnedProjects(await Promise.all(ownedPromises));
+
+            // Prepare promises for user attestations
+            const newAttestations = {};
             for (const type of ATTESTATION_TYPES_TO_CHECK) {
-                try {
-                    const hasAttestation = await attestationServiceContract.hasAttestationType(account, type);
-                    attestations[type] = hasAttestation;
-                } catch (attestationErr) {
-                    console.warn(`Could not check attestation type "${type}" for ${account}:`, attestationErr.message);
-                    attestations[type] = false; // Assume false on error
-                }
+                attestationPromises.push(
+                    (async () => {
+                        try {
+                            const hasAttestation = await attestationServiceContract.hasAttestationType(account, type);
+                            return { type, hasAttestation };
+                        } catch (attestationErr) {
+                            console.warn(`Could not check attestation type "${type}" for ${account}:`, attestationErr.message);
+                            return { type, hasAttestation: false }; // Assume false on error
+                        }
+                    })()
+                );
             }
-            setUserAttestations(attestations);
+
+            // Execute all attestation checks in parallel
+            const fetchedAttestations = await Promise.all(attestationPromises);
+            fetchedAttestations.forEach(({ type, hasAttestation }) => {
+                newAttestations[type] = hasAttestation;
+            });
+            setUserAttestations(newAttestations);
+
+            // Fetch mCUSD Balance
+            const balance = await mockCUSDContract.balanceOf(account);
+            setMcusdBalance(ethers.formatUnits(balance, 18));
 
         } catch (err) {
             console.error("Error fetching user profile data:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error fetching profile";
-            setError(`Error loading profile: ${errorMessage}`);
+            setError(`Error loading profile: ${errorMessage}`); // Use setError toast
         } finally {
             setProfileLoading(false);
         }
     };
 
-    // Effect hook to fetch data when dependencies change
     useEffect(() => {
-        fetchUserProfileData();
-    }, [account, projectRegistryContract, quadraticFundingContract, attestationServiceContract]); // Re-fetch if these change
+        if (account && projectRegistryContract && quadraticFundingContract && attestationServiceContract && mockCUSDContract) {
+            fetchUserProfileData();
+        }
+    }, [account, projectRegistryContract, quadraticFundingContract, attestationServiceContract, mockCUSDContract]);
 
     return (
         <div className="dapp-section user-profile-section">
@@ -98,6 +123,7 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
             ) : (
                 <>
                     <p><strong>Wallet Address:</strong> {account}</p>
+                    <p><strong>mCUSD Balance:</strong> {mcUSDbalance} mCUSD</p>
 
                     {/* Attestations Section */}
                     <div className="profile-subsection">
@@ -120,15 +146,13 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
                         <h4 className="subsection-title">Projects I Own ({ownedProjects.length}):</h4>
                         {ownedProjects.length > 0 ? (
                             <ul className="project-list-ul">
-                                {ownedProjects.map((project, index) => ( // Added index for fallback key
-                                    // Safety check for project.id before calling toString()
+                                {ownedProjects.map((project, index) => (
                                     <li key={project.id ? project.id.toString() : `owned-${index}`} className="project-item">
                                         <h5 className="project-item-title">
                                             {project.name} (ID: {project.id ? project.id.toString() : 'N/A'})
                                         </h5>
                                         <p>Description CID: {project.descriptionCID}</p>
                                         <p>Category: {project.category}</p>
-                                        {/* You can add more details or links to view full project */}
                                     </li>
                                 ))}
                             </ul>
@@ -142,14 +166,12 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
                         <h4 className="subsection-title">Projects I've Contributed To ({contributedProjects.length}):</h4>
                         {contributedProjects.length > 0 ? (
                             <ul className="project-list-ul">
-                                {contributedProjects.map((project, index) => ( // Added index for fallback key
-                                    // Safety check for project.id before calling toString()
+                                {contributedProjects.map((project, index) => (
                                     <li key={project.id ? project.id.toString() : `contributed-${index}`} className="project-item">
                                         <h5 className="project-item-title">
                                             {project.name} (ID: {project.id ? project.id.toString() : 'N/A'})
                                         </h5>
                                         <p>Your Contribution: {ethers.formatUnits(project.yourContribution, 18)} mCUSD</p>
-                                        {/* You can add more details or links */}
                                     </li>
                                 ))}
                             </ul>

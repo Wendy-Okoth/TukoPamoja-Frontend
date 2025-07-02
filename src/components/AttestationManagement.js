@@ -5,8 +5,8 @@ import { ethers } from 'ethers';
 // Define common attestation types for dropdown/suggestion
 const COMMON_ATTESTATION_TYPES = ["Artist", "Verified Builder", "Community Member", "Judge", "Developer"];
 
-// `loading` prop is already passed from App.js for general loading state
-function AttestationManagement({ account, attestationServiceContract, setLoading, setError, loading }) {
+// Added showSuccess prop
+function AttestationManagement({ account, attestationServiceContract, setLoading, setError, showSuccess, loading }) {
     // State for Owner-only section
     const [attestorAddressInput, setAttestorAddressInput] = useState('');
     const [isOwner, setIsOwner] = useState(false);
@@ -16,21 +16,17 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
     const [attestationTypeInput, setAttestationTypeInput] = useState('');
     const [isAttestor, setIsAttestor] = useState(false);
 
-    const [attestationStatusMessage, setAttestationStatusMessage] = useState(''); // For feedback
+    // Removed: const [attestationStatusMessage, setAttestationStatusMessage] = useState(''); // For feedback
 
     // --- Fetch Owner and Attestor Status ---
     const checkRoles = async () => {
-        // Set loading *locally* for the role check itself, distinct from general DApp loading
-        // For simplicity here, we'll just use the general `setLoading` passed from App.js
-        // If you wanted finer-grained control, you'd add a local state like `const [checkingRoles, setCheckingRoles] = useState(true);`
-
         if (!attestationServiceContract || !account) {
             setIsOwner(false);
             setIsAttestor(false);
             return;
         }
 
-        setError(null); // Clear errors specific to this component
+        // Removed: setError(null); // Errors now handled by toasts
 
         try {
             // Check if connected account is the owner
@@ -46,7 +42,7 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
 
         } catch (err) {
             console.error("Error checking owner/attestor roles:", err);
-            setError(`Error checking roles: ${err.message || 'Unknown error'}`);
+            setError(`Error checking roles: ${err.message || 'Unknown error'}`); // Use setError toast
             setIsOwner(false);
             setIsAttestor(false);
         }
@@ -55,8 +51,6 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
     // Use effect to check roles on account/contract change
     useEffect(() => {
         checkRoles();
-        // The `loading` prop from App.js already controls overall UI disablement.
-        // No need for `setProfileLoading` here.
     }, [account, attestationServiceContract]);
 
 
@@ -64,29 +58,30 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
     const handleAddAttestor = async (e) => {
         e.preventDefault();
         if (!attestationServiceContract || !attestorAddressInput) {
-            setError("AttestationService contract not ready or address is empty.");
+            setError("AttestationService contract not ready or address is empty."); // Use setError toast
             return;
         }
         if (!ethers.isAddress(attestorAddressInput)) {
-            setError("Invalid Ethereum address for attestor.");
+            setError("Invalid Ethereum address for attestor."); // Use setError toast
             return;
         }
 
         setLoading(true); // Use the global loading state
-        setError(null);
-        setAttestationStatusMessage('');
+        // Removed: setError(null);
+        // Removed: setAttestationStatusMessage('');
 
         try {
             const tx = await attestationServiceContract.addAttestor(attestorAddressInput);
-            setAttestationStatusMessage(`Add Attestor Tx sent: ${tx.hash}`);
+            // Removed: setAttestationStatusMessage(`Add Attestor Tx sent: ${tx.hash}`);
+            console.log("Add Attestor Tx sent:", tx.hash);
             await tx.wait();
-            setAttestationStatusMessage(`Attestor ${attestorAddressInput} added successfully!`);
+            showSuccess(`Attestor ${attestorAddressInput.substring(0, 6)}... added successfully!`); // Show success toast
             setAttestorAddressInput(''); // Clear input
             await checkRoles(); // Re-check roles as state might have changed
         } catch (err) {
             console.error("Error adding attestor:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error";
-            setError(`Error adding attestor: ${errorMessage}`);
+            setError(`Error adding attestor: ${errorMessage}`); // Use setError toast
         } finally {
             setLoading(false); // Use the global loading state
         }
@@ -95,29 +90,30 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
     const handleRemoveAttestor = async (e) => {
         e.preventDefault();
         if (!attestationServiceContract || !attestorAddressInput) {
-            setError("AttestationService contract not ready or address is empty.");
+            setError("AttestationService contract not ready or address is empty."); // Use setError toast
             return;
         }
         if (!ethers.isAddress(attestorAddressInput)) {
-            setError("Invalid Ethereum address for attestor.");
+            setError("Invalid Ethereum address for attestor."); // Use setError toast
             return;
         }
 
         setLoading(true); // Use the global loading state
-        setError(null);
-        setAttestationStatusMessage('');
+        // Removed: setError(null);
+        // Removed: setAttestationStatusMessage('');
 
         try {
             const tx = await attestationServiceContract.removeAttestor(attestorAddressInput);
-            setAttestationStatusMessage(`Remove Attestor Tx sent: ${tx.hash}`);
+            // Removed: setAttestationStatusMessage(`Remove Attestor Tx sent: ${tx.hash}`);
+            console.log("Remove Attestor Tx sent:", tx.hash);
             await tx.wait();
-            setAttestationStatusMessage(`Attestor ${attestorAddressInput} removed successfully!`);
+            showSuccess(`Attestor ${attestorAddressInput.substring(0, 6)}... removed successfully!`); // Show success toast
             setAttestorAddressInput(''); // Clear input
             await checkRoles(); // Re-check roles
         } catch (err) {
             console.error("Error removing attestor:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error";
-            setError(`Error removing attestor: ${errorMessage}`);
+            setError(`Error removing attestor: ${errorMessage}`); // Use setError toast
         } finally {
             setLoading(false); // Use the global loading state
         }
@@ -127,17 +123,17 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
     const handleIssueAttestation = async (e) => {
         e.preventDefault();
         if (!attestationServiceContract || !recipientAddressInput || !attestationTypeInput) {
-            setError("AttestationService contract not ready, recipient, or attestation type is empty.");
+            setError("AttestationService contract not ready, recipient, or attestation type is empty."); // Use setError toast
             return;
         }
         if (!ethers.isAddress(recipientAddressInput)) {
-            setError("Invalid Ethereum address for recipient.");
+            setError("Invalid Ethereum address for recipient."); // Use setError toast
             return;
         }
 
         setLoading(true); // Use the global loading state
-        setError(null);
-        setAttestationStatusMessage('');
+        // Removed: setError(null);
+        // Removed: setAttestationStatusMessage('');
 
         try {
             // For now, use a placeholder hash. In a real scenario, this might come from off-chain data.
@@ -148,15 +144,16 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
                 attestationTypeInput,
                 attestationHash
             );
-            setAttestationStatusMessage(`Issue Attestation Tx sent: ${tx.hash}`);
+            // Removed: setAttestationStatusMessage(`Issue Attestation Tx sent: ${tx.hash}`);
+            console.log("Issue Attestation Tx sent:", tx.hash);
             await tx.wait();
-            setAttestationStatusMessage(`Attestation '${attestationTypeInput}' issued to ${recipientAddressInput} successfully!`);
+            showSuccess(`Attestation '${attestationTypeInput}' issued to ${recipientAddressInput.substring(0, 6)}... successfully!`); // Show success toast
             setRecipientAddressInput(''); // Clear inputs
             setAttestationTypeInput('');
         } catch (err) {
             console.error("Error issuing attestation:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error";
-            setError(`Error issuing attestation: ${errorMessage}`);
+            setError(`Error issuing attestation: ${errorMessage}`); // Use setError toast
         } finally {
             setLoading(false); // Use the global loading state
         }
@@ -176,7 +173,7 @@ function AttestationManagement({ account, attestationServiceContract, setLoading
                     <p><strong>Is Owner:</strong> {isOwner ? '✅ Yes' : '❌ No'}</p>
                     <p><strong>Is Attestor:</strong> {isAttestor ? '✅ Yes' : '❌ No'}</p>
 
-                    {attestationStatusMessage && <p className="status-message info-text">{attestationStatusMessage}</p>}
+                    {/* Removed: attestationStatusMessage display */}
 
                     {/* Owner-only Section */}
                     {isOwner && (

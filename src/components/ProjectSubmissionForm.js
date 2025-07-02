@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Import axios for HTTP requests
 
-function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, setLoading, setError, loading }) {
+// Added showSuccess prop
+function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, setLoading, setError, showSuccess, loading }) {
     // State for basic form inputs
     const [projectName, setProjectName] = useState('');
     const [descriptionCID, setDescriptionCID] = useState('');
@@ -82,7 +83,7 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
             return res.data.IpfsHash; // Return the CID
         } catch (error) {
             console.error(`Error uploading ${file.name} to Pinata:`, error.response ? error.response.data : error.message);
-            setError(`Failed to upload "${file.name}" to IPFS. Check console for details.`);
+            setError(`Failed to upload "${file.name}" to IPFS. Check console for details.`); // Use setError toast
             return null;
         }
     };
@@ -93,17 +94,17 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
 
         // Basic validation
         if (!projectRegistryContract) {
-            setError("ProjectRegistry contract not initialized. Please connect wallet.");
+            setError("ProjectRegistry contract not initialized. Please connect wallet."); // Use setError toast
             return;
         }
         if (!projectName || !descriptionCID || !category) {
-            setError("Project Name, Description CID, and Category are required.");
+            setError("Project Name, Description CID, and Category are required."); // Use setError toast
             return;
         }
 
         setLoading(true); // Indicate overall submission process (including upload and transaction)
         setUploading(true); // Indicate file upload phase
-        setError(null);
+        // Removed: setError(null); // Errors now handled by toasts
 
         let uploadedImgs = [];
         let uploadedAudios = [];
@@ -157,10 +158,15 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
             );
 
             console.log("Transaction sent:", tx.hash);
-            alert(`Blockchain transaction sent! Waiting for confirmation (Hash: ${tx.hash})`);
+            // Removed: alert(`Blockchain transaction sent! Waiting for confirmation (Hash: ${tx.hash})`);
             await tx.wait(); // Wait for the transaction to be mined
             console.log("Project submitted successfully on-chain!");
-            alert("Project submitted successfully!");
+            // Removed: alert("Project submitted successfully!");
+
+            // Call the callback to refresh project list in App.js
+            if (onProjectSubmitted) {
+                onProjectSubmitted(); // Notify parent to refresh project list and show success toast
+            }
 
             // Clear all form fields and states after successful submission
             setProjectName('');
@@ -171,14 +177,10 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
             setFinalImageCIDs([]); // Clear final CIDs display
             setFinalAudioCIDs([]); // Clear final CIDs display
 
-            if (onProjectSubmitted) {
-                onProjectSubmitted(); // Notify parent to refresh project list
-            }
-
         } catch (err) {
             console.error("Error during project submission process:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error";
-            setError(`Error submitting project: ${errorMessage}`);
+            setError(`Error submitting project: ${errorMessage}`); // Use setError toast
         } finally {
             setLoading(false); // End overall loading state
             setUploading(false); // Ensure uploading state is false
@@ -195,11 +197,12 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
                     <input
                         type="text"
                         id="projectName"
+                        className="form-input"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
+                        placeholder="e.g., Sustainable Community Garden"
+                        required
                         disabled={loading || uploading} // Disable during upload or transaction
-                        placeholder="e.g., Community Garden Initiative"
-                        className="form-input"
                     />
                 </div>
                 <div className="form-group">
@@ -207,6 +210,7 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
                     <input
                         type="text"
                         id="descriptionCID"
+                        className="form-input"
                         value={descriptionCID}
                         onChange={(e) => setDescriptionCID(e.target.value)}
                         disabled={loading || uploading}
@@ -219,6 +223,7 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
                     <input
                         type="text"
                         id="category"
+                        className="form-input"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         disabled={loading || uploading}
