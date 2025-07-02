@@ -17,6 +17,7 @@ import ProjectSubmissionForm from './components/ProjectSubmissionForm';
 import ProjectList from './components/ProjectList';
 import UserProfile from './components/UserProfile';
 import AttestationManagement from './components/AttestationManagement';
+import CopyToClipboardButton from './components/CopyToClipboardButton'; // NEW: Import CopyToClipboardButton
 
 function App() {
   // --- Wallet and Network State ---
@@ -32,11 +33,10 @@ function App() {
   const [mockCUSDContract, setMockCUSDContract] = useState(null);
   const [quadraticFundingContract, setQuadraticFundingContract] = useState(null);
 
-  // --- UI/Loading/Error State ---
+  // --- UI/Loading State ---
   const [loading, setLoading] = useState(false);
-  // Removed: const [error, setError] = useState(null); // Error state will be handled by toasts
 
-  // NEW: Toast functions to replace setError
+  // Toast functions to replace setError
   const showError = (message) => {
     toast.error(message);
   };
@@ -54,7 +54,6 @@ function App() {
   // --- Function to Connect Wallet ---
   const connectWallet = async () => {
     setLoading(true);
-    // Removed: setError(null);
     try {
       if (window.ethereum) {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -80,7 +79,7 @@ function App() {
       }
     } catch (err) {
       console.error("Error connecting wallet:", err);
-      showError(`Error connecting wallet: ${err.message || err.toString()}`); // Show error toast
+      showError(`Error connecting wallet: ${err.message || err.toString()}`); // Use showError toast
     } finally {
       setLoading(false);
     }
@@ -123,7 +122,7 @@ function App() {
 
         } catch (error) {
           console.error("Error initializing contracts:", error);
-          showError("Failed to initialize contracts. Please check network and addresses."); // Show error toast
+          showError("Failed to initialize contracts. Please check network and addresses."); // Use showError toast
           setProjectRegistryContract(null);
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
@@ -204,13 +203,16 @@ function App() {
             </button>
           ) : (
             <div>
-              <p>Connected Account: <span className="connected-account-address">{account}</span></p>
+              <p>
+                Connected Account: <span className="connected-account-address">{account}</span>
+                {/* NEW: Copy button for account address */}
+                {account && <CopyToClipboardButton textToCopy={account} className="copy-button-small" />}
+              </p>
               <p>Network: <span className="connected-network-name">{network}</span></p>
             </div>
           )}
         </div>
 
-        {/* Removed: Global Error Message display (now handled by toasts) */}
         {loading && <p className="status-message loading-message">Loading...</p>}
 
 
@@ -282,6 +284,7 @@ function App() {
                 setLoading={setLoading}
                 setError={showError} // Pass showError function
                 loading={loading}
+                mockCUSDContract={mockCUSDContract} // Pass mockCUSDContract
               />
             )}
 
@@ -316,5 +319,6 @@ function App() {
 }
 
 export default App;
+
 
      

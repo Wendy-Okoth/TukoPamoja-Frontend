@@ -1,8 +1,7 @@
 // src/components/ProjectList.js
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-// Removed: import { create } from 'ipfs-http-client'; // No longer needed for updates
-// Removed: import moment from 'moment'; // No longer needed for updates
+import CopyToClipboardButton from './CopyToClipboardButton'; // NEW: Import CopyToClipboardButton
 
 // Make sure mockCUSDContract and quadraticFundingContract are passed as props from App.js
 function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setError, loading, mockCUSDContract, quadraticFundingContract }) {
@@ -16,7 +15,6 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
         }
 
         setLoading(true); // Global loading for the DApp
-        setError(null); // Clear previous errors via toast
 
         try {
             const rawProjects = await projectRegistryContract.getAllActiveProjects();
@@ -70,7 +68,7 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
         } catch (err) {
             console.error("Error fetching projects or stats:", err);
             const errorMessage = err.reason || err.data?.message || err.message || "Unknown error";
-            setError(`Error fetching projects: ${errorMessage}`); // Use setError toast
+            setError(`Error fetching projects: ${errorMessage}`); // Use setError toast (which is showError from App.js)
             setProjects([]);
         } finally {
             setLoading(false); // Global loading off
@@ -138,9 +136,12 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
                                 <p>
                                     <strong className="project-item-strong-label">Description CID:</strong>
                                     {project.descriptionCID ? (
-                                        <a href={`https://cloudflare-ipfs.com/ipfs/${project.descriptionCID}`} target="_blank" rel="noopener noreferrer">
-                                            {project.descriptionCID}
-                                        </a>
+                                        <>
+                                            <a href={`https://cloudflare-ipfs.com/ipfs/${project.descriptionCID}`} target="_blank" rel="noopener noreferrer">
+                                                {project.descriptionCID}
+                                            </a>
+                                            <CopyToClipboardButton textToCopy={project.descriptionCID} className="copy-button-small" /> {/* NEW: Copy button */}
+                                        </>
                                     ) : 'N/A'}
                                 </p>
                                 <p><strong className="project-item-strong-label">Category:</strong> {project.category}</p>
@@ -167,13 +168,18 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
                                         <h5 className="media-section-title">Images:</h5>
                                         <div className="media-container images-container">
                                             {project.imageCIDs.map((cid, imgIndex) => (
-                                                <img
-                                                    key={imgIndex}
-                                                    src={`https://cloudflare-ipfs.com/ipfs/${cid}`}
-                                                    alt={`Project Visual ${imgIndex + 1}`}
-                                                    className="project-media-item project-image"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src="https://via.placeholder.com/150?text=Image+Load+Error"; }}
-                                                />
+                                                <div key={`img-container-${imgIndex}`} className="media-item-wrapper">
+                                                    <img
+                                                        src={`https://cloudflare-ipfs.com/ipfs/${cid}`}
+                                                        alt={`Project Visual ${imgIndex + 1}`}
+                                                        className="project-media-item project-image"
+                                                        onError={(e) => { e.target.onerror = null; e.target.src="https://via.placeholder.com/150?text=Image+Load+Error"; }}
+                                                    />
+                                                    <a href={`https://cloudflare-ipfs.com/ipfs/${cid}`} target="_blank" rel="noopener noreferrer" className="cid-link-small">
+                                                        {cid.substring(0, 10)}... {/* Show truncated CID */}
+                                                    </a>
+                                                    <CopyToClipboardButton textToCopy={cid} className="copy-button-small" /> {/* NEW: Copy button */}
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -185,10 +191,16 @@ function ProjectList({ projectRegistryContract, refreshTrigger, setLoading, setE
                                         <h5 className="media-section-title">Audio:</h5>
                                         <div className="media-container audio-container">
                                             {project.audioCIDs.map((cid, audioIndex) => (
-                                                <audio key={audioIndex} controls className="project-media-item project-audio">
-                                                    <source src={`https://cloudflare-ipfs.com/ipfs/${cid}`} type="audio/mpeg" />
-                                                    Your browser does not support the audio element.
-                                                </audio>
+                                                <div key={`audio-container-${audioIndex}`} className="media-item-wrapper">
+                                                    <audio controls className="project-media-item project-audio">
+                                                        <source src={`https://cloudflare-ipfs.com/ipfs/${cid}`} type="audio/mpeg" />
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                    <a href={`https://cloudflare-ipfs.com/ipfs/${cid}`} target="_blank" rel="noopener noreferrer" className="cid-link-small">
+                                                        {cid.substring(0, 10)}... {/* Show truncated CID */}
+                                                    </a>
+                                                    <CopyToClipboardButton textToCopy={cid} className="copy-button-small" /> {/* NEW: Copy button */}
+                                                </div>
                                             ))}
                                         </div>
                                     </div>

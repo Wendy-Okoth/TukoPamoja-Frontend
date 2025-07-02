@@ -1,6 +1,7 @@
 // src/components/UserProfile.js
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import CopyToClipboardButton from './CopyToClipboardButton'; // NEW: Import CopyToClipboardButton
 
 // Assume a list of attestation types your system might issue
 const ATTESTATION_TYPES_TO_CHECK = ["Artist", "Verified Builder", "Community Member", "Contributor"];
@@ -26,15 +27,44 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
         setError(null); // Clear errors specific to profile page via toast
 
         try {
-            // --- Fetch All Projects ---
-            const allProjects = await projectRegistryContract.getAllActiveProjects();
+            // --- Step 1: Launch all independent top-level fetches in parallel ---
+            const [
+                allProjectsRaw,
+                mcUSDbalanceRaw,
+                fetchedAttestationsPromises
+            ] = await Promise.all([
+                projectRegistryContract.getAllActiveProjects(),
+                mockCUSDContract.balanceOf(account),
+                Promise.all(
+                    ATTESTATION_TYPES_TO_CHECK.map(async (type) => {
+                        try {
+                            const hasAttestation = await attestationServiceContract.hasAttestationType(account, type);
+                            return { type, hasAttestation };
+                        } catch (attestationErr) {
+                            console.warn(`Could not check attestation type "${type}" for ${account}:`, attestationErr.message);
+                            return { type, hasAttestation: false }; // Assume false on error
+                        }
+                    })
+                )
+            ]);
 
-            const ownedPromises = [];
-            const contributedPromises = [];
-            const attestationPromises = [];
+            // --- Step 2: Process fetched data ---
 
-            // Prepare promises for owned and contributed projects
-            for (const project of allProjects) {
+            // Process mCUSD Balance
+            setMcusdBalance(ethers.formatUnits(mcUSDbalanceRaw, 18));
+
+            // Process Attestations
+            const newAttestations = {};
+            fetchedAttestationsPromises.forEach(({ type, hasAttestation }) => {
+                newAttestations[type] = hasAttestation;
+            });
+            setUserAttestations(newAttestations);
+
+            // Process Projects to Determine Owned and Contributed
+            const owned = [];
+            const contributedPromises = []; // Collect promises for contributions
+
+            for (const project of allProjectsRaw) {
                 if (!project || project.id === undefined || project.id === null) {
                     console.warn("Skipping malformed project object in UserProfile due to missing or invalid 'id':", project);
                     continue;
@@ -42,10 +72,10 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
 
                 // Check if user is the owner
                 if (project.owner && project.owner.toLowerCase() === account.toLowerCase()) {
-                    ownedPromises.push(Promise.resolve(project)); // Already have the project data
+                    owned.push(project);
                 }
 
-                // Check for user's contribution to this project
+                // Prepare promise for user's contribution to this project
                 contributedPromises.push(
                     (async () => {
                         try {
@@ -69,35 +99,7 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
             const allContributions = await Promise.all(contributedPromises);
             setContributedProjects(allContributions.filter(p => p !== null)); // Filter out nulls
 
-            // Execute all owned projects (already resolved promises)
-            setOwnedProjects(await Promise.all(ownedPromises));
-
-            // Prepare promises for user attestations
-            const newAttestations = {};
-            for (const type of ATTESTATION_TYPES_TO_CHECK) {
-                attestationPromises.push(
-                    (async () => {
-                        try {
-                            const hasAttestation = await attestationServiceContract.hasAttestationType(account, type);
-                            return { type, hasAttestation };
-                        } catch (attestationErr) {
-                            console.warn(`Could not check attestation type "${type}" for ${account}:`, attestationErr.message);
-                            return { type, hasAttestation: false }; // Assume false on error
-                        }
-                    })()
-                );
-            }
-
-            // Execute all attestation checks in parallel
-            const fetchedAttestations = await Promise.all(attestationPromises);
-            fetchedAttestations.forEach(({ type, hasAttestation }) => {
-                newAttestations[type] = hasAttestation;
-            });
-            setUserAttestations(newAttestations);
-
-            // Fetch mCUSD Balance
-            const balance = await mockCUSDContract.balanceOf(account);
-            setMcusdBalance(ethers.formatUnits(balance, 18));
+            setOwnedProjects(owned); // Set owned projects after the loop
 
         } catch (err) {
             console.error("Error fetching user profile data:", err);
@@ -122,7 +124,10 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
                 <p className="info-text">Loading your profile data...</p>
             ) : (
                 <>
-                    <p><strong>Wallet Address:</strong> {account}</p>
+                    <p>
+                        <strong>Wallet Address:</strong> {account}
+                        {account && <CopyToClipboardButton textToCopy={account} className="copy-button-small" />} {/* NEW: Copy button */}
+                    </p>
                     <p><strong>mCUSD Balance:</strong> {mcUSDbalance} mCUSD</p>
 
                     {/* Attestations Section */}
@@ -151,7 +156,10 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
                                         <h5 className="project-item-title">
                                             {project.name} (ID: {project.id ? project.id.toString() : 'N/A'})
                                         </h5>
-                                        <p>Description CID: {project.descriptionCID}</p>
+                                        <p>
+                                            Description CID: {project.descriptionCID}
+                                            {project.descriptionCID && <CopyToClipboardButton textToCopy={project.descriptionCID} className="copy-button-small" />} {/* NEW: Copy button */}
+                                        </p>
                                         <p>Category: {project.category}</p>
                                     </li>
                                 ))}
@@ -172,6 +180,7 @@ function UserProfile({ account, projectRegistryContract, quadraticFundingContrac
                                             {project.name} (ID: {project.id ? project.id.toString() : 'N/A'})
                                         </h5>
                                         <p>Your Contribution: {ethers.formatUnits(project.yourContribution, 18)} mCUSD</p>
+                                        {/* You could add a copy button for project.id here too if desired */}
                                     </li>
                                 ))}
                             </ul>

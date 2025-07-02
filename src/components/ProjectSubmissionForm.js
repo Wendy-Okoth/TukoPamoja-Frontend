@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Import axios for HTTP requests
 
+// REMOVED: import { create } from 'ipfs-http-client'; // No longer needed as Pinata is used
+// REMOVED: const ipfs = create({ host: 'localhost', port: 5001, protocol: 'http' }); // No longer needed
+
 // Added showSuccess prop
 function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, setLoading, setError, showSuccess, loading }) {
     // State for basic form inputs
@@ -104,7 +107,7 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
 
         setLoading(true); // Indicate overall submission process (including upload and transaction)
         setUploading(true); // Indicate file upload phase
-        // Removed: setError(null); // Errors now handled by toasts
+        // REMOVED: setError(null); // Errors now handled by toasts
 
         let uploadedImgs = [];
         let uploadedAudios = [];
@@ -158,10 +161,10 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
             );
 
             console.log("Transaction sent:", tx.hash);
-            // Removed: alert(`Blockchain transaction sent! Waiting for confirmation (Hash: ${tx.hash})`);
+            showSuccess(`Blockchain transaction sent! Waiting for confirmation (Hash: ${tx.hash.substring(0, 6)}...).`); // Use showSuccess toast
             await tx.wait(); // Wait for the transaction to be mined
             console.log("Project submitted successfully on-chain!");
-            // Removed: alert("Project submitted successfully!");
+            showSuccess("Project submitted successfully!"); // Use showSuccess toast
 
             // Call the callback to refresh project list in App.js
             if (onProjectSubmitted) {
@@ -303,7 +306,7 @@ function ProjectSubmissionForm({ projectRegistryContract, onProjectSubmitted, se
                                 {finalAudioCIDs.map((cid, idx) => (
                                     <li key={`aud-${idx}`}><a href={`https://cloudflare-ipfs.com/ipfs/${cid}`} target="_blank" rel="noopener noreferrer">{cid}</a></li>
                                 ))}
-                            </ul>
+                                </ul>
                         </div>
                     )}
                 </div>
