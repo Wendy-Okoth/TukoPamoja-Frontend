@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import './App.css';
-import { ToastContainer, toast } from 'react-toastify'; // NEW: Import ToastContainer and toast
-import 'react-toastify/dist/ReactToastify.css'; // NEW: Import toastify CSS
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Import contract addresses and ABIs
 import { CONTRACT_ADDRESSES } from './config/contractAddresses';
@@ -17,7 +17,7 @@ import ProjectSubmissionForm from './components/ProjectSubmissionForm';
 import ProjectList from './components/ProjectList';
 import UserProfile from './components/UserProfile';
 import AttestationManagement from './components/AttestationManagement';
-import CopyToClipboardButton from './components/CopyToClipboardButton'; // NEW: Import CopyToClipboardButton
+import CopyToClipboardButton from './components/CopyToClipboardButton';
 
 function App() {
   // --- Wallet and Network State ---
@@ -47,7 +47,7 @@ function App() {
 
   const [refreshProjects, setRefreshProjects] = useState(0); // Trigger for ProjectList refresh
 
-  // --- NEW: Page Navigation State ---
+  // --- Page Navigation State ---
   const [currentPage, setCurrentPage] = useState('projects'); // 'projects', 'submit', 'profile', or 'attest'
 
 
@@ -69,17 +69,17 @@ function App() {
         const networkDetails = await newProvider.getNetwork();
         setNetwork(networkDetails.name);
 
-        showSuccess("Wallet connected: " + address.substring(0, 6) + "..."); // Show success toast
+        showSuccess("Wallet connected: " + address.substring(0, 6) + "...");
         console.log("Wallet connected:", address);
         console.log("Network:", networkDetails.name);
 
       } else {
-        showError("MetaMask or a compatible wallet is not installed."); // Show error toast
+        showError("MetaMask or a compatible wallet is not installed.");
         console.log("MetaMask or a compatible wallet is not installed.");
       }
     } catch (err) {
       console.error("Error connecting wallet:", err);
-      showError(`Error connecting wallet: ${err.message || err.toString()}`); // Use showError toast
+      showError(`Error connecting wallet: ${err.message || err.toString()}`);
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ function App() {
 
         } catch (error) {
           console.error("Error initializing contracts:", error);
-          showError("Failed to initialize contracts. Please check network and addresses."); // Use showError toast
+          showError("Failed to initialize contracts. Please check network and addresses.");
           setProjectRegistryContract(null);
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
@@ -160,7 +160,7 @@ function App() {
           setAttestationServiceContract(null);
           setMockCUSDContract(null);
           setQuadraticFundingContract(null);
-          showError("Wallet disconnected."); // Show toast on disconnect
+          showError("Wallet disconnected.");
           console.log("Wallet disconnected.");
         }
       };
@@ -185,12 +185,11 @@ function App() {
   const handleProjectSubmitted = () => {
     setRefreshProjects(prev => prev + 1);
     setCurrentPage('projects'); // Navigate to projects page after submission
-    showSuccess("Project submitted successfully!"); // Show success toast
+    showSuccess("Project submitted successfully!");
   };
 
   return (
     <div className="App">
-      {/* NEW: ToastContainer component for displaying notifications */}
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       <header className="App-header">
         <h1>Tuko Pamoja DApp</h1>
@@ -205,7 +204,6 @@ function App() {
             <div>
               <p>
                 Connected Account: <span className="connected-account-address">{account}</span>
-                {/* NEW: Copy button for account address */}
                 {account && <CopyToClipboardButton textToCopy={account} className="copy-button-small" />}
               </p>
               <p>Network: <span className="connected-network-name">{network}</span></p>
@@ -254,12 +252,14 @@ function App() {
             {/* Conditional Rendering based on currentPage state */}
             {currentPage === 'projects' && (
               <ProjectList
+                account={account} // NEW: Pass account to ProjectList
+                showSuccess={showSuccess} // NEW: Pass showSuccess to ProjectList
                 projectRegistryContract={projectRegistryContract}
                 mockCUSDContract={mockCUSDContract}
                 quadraticFundingContract={quadraticFundingContract}
                 refreshTrigger={refreshProjects}
                 setLoading={setLoading}
-                setError={showError} // Pass showError function
+                setError={showError}
                 loading={loading}
               />
             )}
@@ -269,8 +269,8 @@ function App() {
                 projectRegistryContract={projectRegistryContract}
                 onProjectSubmitted={handleProjectSubmitted}
                 setLoading={setLoading}
-                setError={showError} // Pass showError function
-                showSuccess={showSuccess} // Pass showSuccess function
+                setError={showError}
+                showSuccess={showSuccess}
                 loading={loading}
               />
             )}
@@ -282,9 +282,9 @@ function App() {
                 quadraticFundingContract={quadraticFundingContract}
                 attestationServiceContract={attestationServiceContract}
                 setLoading={setLoading}
-                setError={showError} // Pass showError function
+                setError={showError}
                 loading={loading}
-                mockCUSDContract={mockCUSDContract} // Pass mockCUSDContract
+                mockCUSDContract={mockCUSDContract}
               />
             )}
 
@@ -293,8 +293,8 @@ function App() {
                 account={account}
                 attestationServiceContract={attestationServiceContract}
                 setLoading={setLoading}
-                setError={showError} // Pass showError function
-                showSuccess={showSuccess} // Pass showSuccess function
+                setError={showError}
+                showSuccess={showSuccess}
                 loading={loading}
               />
             )}
