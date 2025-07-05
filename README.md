@@ -1,70 +1,25 @@
-# Getting Started with Create React App
+The frontend is a React.js application that provides the user interface for interacting with the smart contracts and IPFS.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Technology Stack: Built with React, JavaScript, HTML, and CSS. It uses ethers.js for Web3 interactions and react-toastify for user notifications.
 
-## Available Scripts
+Decentralized Hosting: The compiled React application (the build folder) is deployed to IPFS (InterPlanetary File System) via a pinning service like Pinata. This makes the DApp's interface censorship-resistant and accessible via IPFS gateways (e.g., ipfs.io).
 
-In the project directory, you can run:
+IPFS Content Integration: Project descriptions, images, and audio files are stored on IPFS, and the frontend retrieves them using their CIDs via IPFS gateways.
 
-### `npm start`
+Interaction Flow:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Wallet Connection: Connects to the user's MetaMask wallet using ethers.js.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Contract Initialization: Once connected, it initializes ethers.Contract instances for all deployed smart contracts, allowing read and write operations.
 
-### `npm test`
+Navigation: Provides a navigation bar to switch between different DApp sections:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+All Projects: Fetches project data from ProjectRegistry and contribution stats from QuadraticFunding to display a list of active projects.
 
-### `npm run build`
+Submit Project: Allows users to input project details and calls ProjectRegistry.registerProject. This function is guarded by the AttestationService (requiring an 'Artist' attestation).
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+My Profile: Displays projects owned by the connected user (from ProjectRegistry), their mCUSD balance (from MockERC20), their attestations (from AttestationService), and matching funds available for their projects (from QuadraticFunding).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Attestation Admin: Provides an interface for the contract owner to add/remove attestors, and for attestors to issue new attestations.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Transaction Handling: All write operations (e.g., submitting a project, contributing, issuing an attestation, withdrawing funds) are initiated from the frontend, signed by the user's wallet, and sent to the blockchain.
